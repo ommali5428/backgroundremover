@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Remover</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px dashed #c7c7c7;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #5a67d8);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .preview,
+        .result {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .preview img,
+        .result img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview h4,
+        .result h4 {
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .loader {
+            display: none;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #667eea;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #38b2ac, #319795);
+            color: #fff;
+            font-weight: 600;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(56, 178, 172, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <form method="post" enctype="multipart/form-data" onsubmit="showLoader()">
+        {% csrf_token %}
+
+        <div class="container">
+            <h2>Background Remover</h2>
+            <div class="subtitle">Upload an image & get a clean PNG instantly</div>
+
+            <label for="photo">Upload Image</label>
+            <input type="file" name="photo" id="photo" accept="image/*" onchange="previewImage(event)" required>
+
+            <button type="submit">Remove Background</button>
+
+            <div class="loader" id="loader">
+                Processing image… ⏳
+            </div>
+
+            <div class="preview" id="preview" style="display:none;">
+                <h4>Preview</h4>
+                <img id="previewImg">
+            </div>
+
+            {% if result %}
+            <div class="result">
+                <h4>Result</h4>
+                <img src="data:image/png;base64,{{ result }}">
+
+                <a href="data:image/png;base64,{{ download }}" download="background_removed.png" class="download-btn">
+                    Download PNG
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+
+    <script>
+        function previewImage(event) {
+            const preview = document.getElementById("preview");
+            const img = document.getElementById("previewImg");
+            img.src = URL.createObjectURL(event.target.files[0]);
+            preview.style.display = "block";
+        }
+
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+    </script>
+
+</body>
+
+</html>
